@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Schnitzel stehlen</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 960px;
+    }
+    #game-container {
+      height: 960px;
+      width: 540px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #counter {
+      background-color: black;
+      color: white;
+      width: 540px;
+      text-align: center;
+      font-size: 24px;
+      padding: 10px;
+    }
+    #frau-img {
+      height: calc(960px * 2 / 3);
+      width: 540px;
+    }
+    button {
+      height: calc(960px / 3);
+      width: 540px;
+      font-size: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="counter">Schnitzel gestohlen: 0</div>
+    <img id="frau-img" src="frau.png" alt="Frau">
+    <button id="start-button" onclick="startGame()">Spiel starten</button>
+    <button id="restart-button" onclick="restartGame()" style="display:none;">Neu Starten</button>
+  </div>
+  
+  <script>
+    let stolenSchnitzel = 0;
+    let currentRound = 0;
+    let timer;
+    const timeSequence = [1000, 1600, 800, 2000, 600, 1000, 1400, 2000, 1000, 1500, 200, 2000, 1000, 1500, 500, 1200, 1000, 1500, 2000, 900, 1100, 2000, 1100, 400];
+    
+    const frauImg = document.getElementById('frau-img');
+    frauImg.addEventListener('click', stealSchnitzel);
+
+    function switchImage(imageSrc) {
+      frauImg.setAttribute('src', imageSrc);
+    }
+
+    function stealSchnitzel() {
+      if (frauImg.getAttribute('src') === 'frau-wegschauen.png') {
+        stolenSchnitzel++;
+        document.getElementById('counter').innerText = `Schnitzel gestohlen: ${stolenSchnitzel}`;
+        switchImage('erfolg.png');
+      } else {
+        switchImage('misserfolg.png');
+      }
+      clearTimeout(timer);
+      setTimeout(endGame, 1000);
+    }
+
+    function endGame() {
+      currentRound++;
+      if (currentRound === 5) {
+        switchImage('final-result.png');
+        frauImg.removeEventListener('click', stealSchnitzel);
+        document.getElementById('start-button').style.display = 'none';
+        document.getElementById('restart-button').style.display = 'block';
+      } else {
+        startRound();
+      }
+    }
+
+    function startRound() {
+      let i = 0;
+      switchImage('frau.png');
+      function nextStep() {
+        if (i < timeSequence.length) {
+          switchImage(i % 2 === 0 ? 'frau-wegschauen.png' : 'frau.png');
+          timer = setTimeout(nextStep, timeSequence[i]);
+          i++;
+        } else {
+          stealSchnitzel();
+        }
+      }
+      nextStep();
+    }
+
+    function startGame() {
+      document.getElementById('start-button').style.display = 'none';
+      startRound();
+    }
+
+    function restartGame() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>
